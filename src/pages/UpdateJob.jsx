@@ -1,166 +1,66 @@
-// src/pages/UpdateJob.jsx
-import React, { useState, useEffect, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { AuthContext } from "../contexts/AuthContext";
-import { toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { motion } from "framer-motion";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const UpdateJob = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
-
   const [job, setJob] = useState(null);
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("Web Development");
-  const [summary, setSummary] = useState("");
-  const [coverImage, setCoverImage] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
 
-  const imgbbAPIKey = "d2719ed1cd968e8a0eb1e2436fe20ef8"; 
-
-  // Fetch job details
   useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        const res = await axios.get(`http://localhost:3000/jobs/${id}`);
-        setJob(res.data);
-        setTitle(res.data.title);
-        setCategory(res.data.category);
-        setSummary(res.data.summary);
-
-        // Check ownership
-        if (user && user.email !== res.data.userEmail) {
-          toast.error("You are not allowed to edit this job.");
-          navigate("/allJobs");
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to fetch job details.");
-        navigate("/allJobs");
-      } finally {
+    fetch(`http://localhost:3000/jobs/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setJob(data);
         setLoading(false);
-      }
-    };
-    fetchJob();
-  }, [id, user, navigate]);
+      });
+  }, [id]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    setUpdating(true);
+    const form = e.target;
+    const updatedJob = {
+      title: form.title.value,
+      category: form.category.value,
+      summary: form.summary.value,
+      coverImage: form.coverImage.value,
+    };
 
-    try {
-      let imageUrl = job.coverImage;
+    await fetch(`http://localhost:3000/jobs/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedJob),
+    });
 
-      // Upload new image if selected
-      if (coverImage) {
-        const formData = new FormData();
-        formData.append("image", coverImage);
-        const imgbbRes = await axios.post(
-          `https://api.imgbb.com/1/upload?key=${imgbbAPIKey}`,
-          formData
-        );
-        imageUrl = imgbbRes.data.data.url;
-      }
-
-      const updatedJob = {
-        title,
-        category,
-        summary,
-        coverImage: imageUrl,
-      };
-
-      // Update job on backend
-      await axios.put(`http://localhost:3000/jobs/${id}`, updatedJob);
-
-      toast.success("Job updated successfully!");
-      navigate("/myAddedJobs"); // Redirect to user's jobs page
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to update job.");
-    } finally {
-      setUpdating(false);
-    }
+    alert("Job Updated Successfully!");
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <span className="loading loading-spinner loading-lg text-blue-500"></span>
-      </div>
-    );
-  }
-
-  if (!job) {
-    return <p className="text-center mt-12">Job not found.</p>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8 text-center">Update Job</h1>
-
-      <form
-        onSubmit={handleUpdate}
-        className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow space-y-4"
-      >
-        <div>
-          <label className="block mb-1 font-semibold">Job Title</label>
-          <input
-            type="text"
-            className="w-full border rounded px-3 py-2"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1 font-semibold">Category</label>
-          <select
-            className="w-full border rounded px-3 py-2"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            <option>Web Development</option>
-            <option>Digital Marketing</option>
-            <option>Graphic Designing</option>
-            <option>Content Writing</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-1 font-semibold">Summary</label>
-          <textarea
-            className="w-full border rounded px-3 py-2"
-            rows="4"
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
-            required
-          ></textarea>
-        </div>
-
-        <div>
-          <label className="block mb-1 font-semibold">Cover Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setCoverImage(e.target.files[0])}
-          />
-          <p className="text-gray-500 text-sm mt-1">
-            Leave empty to keep existing image
-          </p>
-        </div>
-
-        <button
+    <motion.div
+      className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <h2 className="text-2xl font-bold mb-4 text-center">Update Job</h2>
+      <form onSubmit={handleUpdate} className="space-y-4">
+        <input defaultValue={job.title} name="title" className="input input-bordered w-full" />
+        <input defaultValue={job.category} name="category" className="input input-bordered w-full" />
+        <textarea defaultValue={job.summary} name="summary" className="textarea textarea-bordered w-full" />
+        <input defaultValue={job.coverImage} name="coverImage" className="input input-bordered w-full" />
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-          disabled={updating}
+          className="btn btn-primary w-full"
         >
-          {updating ? "Updating..." : "Update Job"}
-        </button>
+          Update Job
+        </motion.button>
       </form>
-    </div>
+    </motion.div>
   );
 };
 

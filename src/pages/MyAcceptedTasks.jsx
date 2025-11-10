@@ -1,107 +1,98 @@
-// src/pages/MyAcceptedTasks.jsx
 import React, { useEffect, useState, useContext } from "react";
-import axios from "axios";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../context/AuthContext";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { toast } from "react-toastify";
 
 const MyAcceptedTasks = () => {
   const { user } = useContext(AuthContext);
-  const [tasks, setTasks] = useState([]);
+  const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all jobs that the user has accepted
   useEffect(() => {
-    const fetchAcceptedTasks = async () => {
+    const fetchAcceptedJobs = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/jobs");
-        // Filter jobs where userEmailAccepted includes the logged-in user's email
-        const accepted = res.data.filter(
-          (job) =>
-            job.acceptedBy && job.acceptedBy.includes(user.email)
+        const res = await fetch("http://localhost:3000/jobs");
+        if (!res.ok) throw new Error("Failed to fetch jobs");
+        const data = await res.json();
+        const accepted = data.filter(
+          (job) => job.acceptedBy && job.acceptedBy.includes(user.email)
         );
-        setTasks(accepted);
+        setJobs(accepted);
       } catch (err) {
-        console.error(err);
-        toast.error("Failed to fetch accepted tasks.");
+        toast.error(err.message);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchAcceptedTasks();
+    fetchAcceptedJobs();
   }, [user.email]);
 
-  const handleDoneOrCancel = async (id) => {
+  const handleRemoveJob = async (jobId) => {
     try {
-      // Remove user from acceptedBy array or delete job if needed
-      const task = tasks.find((t) => t._id === id);
-      if (!task) return;
+      const res = await fetch(`http://localhost:3000/jobs/${jobId}`);
+      if (!res.ok) throw new Error("Job not found");
+      const job = await res.json();
 
-      // If you want, you can fully delete the job or just remove user from acceptedBy
-      // For simplicity, let's remove from UI and backend entirely
-      await axios.delete(`http://localhost:3000/jobs/${id}`);
-      setTasks(tasks.filter((t) => t._id !== id));
-      toast.success("Task removed successfully!");
+      // Remove user from acceptedBy
+      const updatedAcceptedBy = job.acceptedBy.filter((email) => email !== user.email);
+
+      const updateRes = await fetch(`http://localhost:3000/jobs/${jobId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...job, acceptedBy: updatedAcceptedBy }),
+      });
+
+      if (!updateRes.ok) throw new Error("Failed to update job");
+
+      // Update UI
+      setJobs((prev) => prev.filter((j) => j._id !== jobId));
+      toast.success("Job removed successfully");
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to remove task.");
+      toast.error(err.message);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <span className="loading loading-spinner loading-lg text-blue-500"></span>
-      </div>
-    );
-  }
+  if (loading) return <LoadingSpinner />;
 
-  if (tasks.length === 0) {
-    return (
-      <p className="text-center mt-12 text-gray-500">
-        You haven't accepted any tasks yet.
-      </p>
-    );
-  }
+  if (jobs.length === 0)
+    return <p className="text-center mt-10">No accepted tasks yet</p>;
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        My Accepted Tasks
-      </h1>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tasks.map((task) => (
-          <div
-            key={task._id}
-            className="border rounded-lg p-4 shadow hover:shadow-md transition flex flex-col"
-          >
-            <img
-              src={task.coverImage}
-              alt={task.title}
-              className="w-full h-40 object-cover rounded mb-3"
-            />
-            <h2 className="text-xl font-semibold">{task.title}</h2>
-            <p className="text-gray-500 mb-2">{task.category}</p>
-            <p className="text-gray-700 mb-4 flex-1">{task.summary}</p>
-
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleDoneOrCancel(task._id)}
-                className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition flex-1"
-              >
-                ✅ Done
-              </button>
-              <button
-                onClick={() => handleDoneOrCancel(task._id)}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition flex-1"
-              >
-                ❌ Cancel
-              </button>
-            </div>
+    <div className="max-w-6xl mx-auto p-6 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {jobs.map((job) => (
+        <div
+          key={job._id}
+          className="border p-4 rounded shadow hover:shadow-lg transition"
+        >
+          <img
+            src={job.coverImage}
+            alt={job.title}
+            className="w-full h-40 object-cover rounded mb-2"
+          />
+          <h3 className="text-xl font-semibold mb-1">{job.title}</h3>
+          <p className="text-sm text-gray-500 mb-1">Category: {job.category}</p>
+          <p className="text-gray-700 mb-2">
+            {job.summary.length > 80
+              ? job.summary.slice(0, 80) + "..."
+              : job.summary}
+          </p>
+          <p className="text-sm text-gray-500 mb-2">Posted By: {job.postedBy}</p>
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={() => handleRemoveJob(job._id)}
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+            >
+              ❌ Cancel
+            </button>
+            <button
+              onClick={() => handleRemoveJob(job._id)}
+              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
+            >
+              ✅ Done
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 };

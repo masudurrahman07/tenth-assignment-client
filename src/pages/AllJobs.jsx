@@ -1,6 +1,6 @@
-// src/pages/AllJobs.jsx
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import LoadingSpinner from "../components/LoadingSpinner";
 import JobCard from "../components/JobCard";
 
 const AllJobs = () => {
@@ -8,38 +8,29 @@ const AllJobs = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const res = await axios.get("http://localhost:3000/jobs");
-        setJobs(res.data);
-      } catch (err) {
-        console.error("Failed to fetch jobs:", err);
-      } finally {
+    fetch("http://localhost:3000/jobs")
+      .then((res) => res.json())
+      .then((data) => {
+        setJobs(data);
         setLoading(false);
-      }
-    };
-
-    fetchJobs();
+      });
   }, []);
 
-  return (
-    <div className="container mx-auto px-4 py-12">
-      <h1 className="text-3xl font-bold mb-8 text-center">All Jobs</h1>
+  if (loading) return <LoadingSpinner />;
 
-      {loading ? (
-        <div className="flex justify-center items-center min-h-[30vh]">
-          <span className="loading loading-spinner loading-lg text-blue-500"></span>
-        </div>
-      ) : jobs.length === 0 ? (
-        <p className="text-gray-500 text-center">No jobs found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {jobs.map((job) => (
-            <JobCard key={job._id} job={job} />
-          ))}
-        </div>
-      )}
-    </div>
+  return (
+    <motion.div
+      className="max-w-6xl mx-auto p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      {jobs.map((job) => (
+        <motion.div whileHover={{ scale: 1.03 }} key={job._id}>
+          <JobCard job={job} />
+        </motion.div>
+      ))}
+    </motion.div>
   );
 };
 

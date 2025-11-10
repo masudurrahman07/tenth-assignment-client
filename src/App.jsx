@@ -5,9 +5,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import AuthProvider from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer"; // (you’ll add Footer.jsx next)
+import Footer from "./components/Footer"; 
 import Home from "./pages/Home";
 import AllJobs from "./pages/AllJobs";
 import AddJob from "./pages/AddJob";
@@ -17,8 +17,8 @@ import JobDetails from "./pages/JobDetails";
 import UpdateJob from "./pages/UpdateJob";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import NotFound404 from "./pages/NotFound404";
-import PrivateRoute from "./components/PrivateRoute"; // we’ll make this soon
+import ErrorPage from "./pages/ErrorPage";
+import PrivateRoute from "./components/PrivateRoutes"; 
 
 const App = () => {
   return (
@@ -27,7 +27,6 @@ const App = () => {
         <div className="flex flex-col min-h-screen">
           <Navbar />
 
-          {/* Main content */}
           <main className="grow">
             <Routes>
               <Route path="/" element={<Home />} />
@@ -74,18 +73,16 @@ const App = () => {
               />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="*" element={<NotFound404 />} />
+              <Route path="*" element={<ErrorPage />} />
             </Routes>
           </main>
 
           <Footer />
         </div>
 
-        {/* Toast notifications */}
         <ToastContainer position="top-center" autoClose={2000} />
       </Router>
     </AuthProvider>
   );
 };
-
 export default App;
