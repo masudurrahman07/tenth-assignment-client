@@ -29,15 +29,22 @@ const UpdateJob = () => {
         setTitle(res.data.title);
         setCategory(res.data.category);
         setSummary(res.data.summary);
+
+        // Check ownership
+        if (user && user.email !== res.data.userEmail) {
+          toast.error("You are not allowed to edit this job.");
+          navigate("/allJobs");
+        }
       } catch (err) {
         console.error(err);
         toast.error("Failed to fetch job details.");
+        navigate("/allJobs");
       } finally {
         setLoading(false);
       }
     };
     fetchJob();
-  }, [id]);
+  }, [id, user, navigate]);
 
   const handleUpdate = async (e) => {
     e.preventDefault();
@@ -46,7 +53,7 @@ const UpdateJob = () => {
     try {
       let imageUrl = job.coverImage;
 
-      
+      // Upload new image if selected
       if (coverImage) {
         const formData = new FormData();
         formData.append("image", coverImage);
@@ -64,11 +71,11 @@ const UpdateJob = () => {
         coverImage: imageUrl,
       };
 
-      // update the job on backend
+      // Update job on backend
       await axios.put(`http://localhost:3000/jobs/${id}`, updatedJob);
 
       toast.success("Job updated successfully!");
-      navigate("/myAddedJobs"); 
+      navigate("/myAddedJobs"); // Redirect to user's jobs page
     } catch (err) {
       console.error(err);
       toast.error("Failed to update job.");
