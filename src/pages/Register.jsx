@@ -5,13 +5,14 @@ import { toast } from "react-toastify";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 const Register = () => {
-  const { register, loginWithGoogle } = useContext(AuthContext);
+  const { signUp, loginWithGoogle } = useContext(AuthContext); // fixed
   const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [photoURL, setPhotoURL] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // for toggle
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e) => {
@@ -33,7 +34,7 @@ const Register = () => {
 
     setLoading(true);
     try {
-      await register(email, password, name, photoURL);
+      await signUp(email, password, name, photoURL); // fixed
       toast.success("Registration successful!");
       navigate("/");
     } catch (err) {
@@ -60,7 +61,7 @@ const Register = () => {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Register</h2>
+      <h2 className="text-2xl font-bold mb-4 text-center">Register</h2>
       <form onSubmit={handleRegister} className="flex flex-col gap-4">
         <input
           type="text"
@@ -82,17 +83,26 @@ const Register = () => {
           type="text"
           value={photoURL}
           onChange={(e) => setPhotoURL(e.target.value)}
-          placeholder="Photo URL"
+          placeholder="Photo URL (optional)"
           className="border px-3 py-2 rounded"
         />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          placeholder="Password"
-          className="border px-3 py-2 rounded"
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"} // toggle
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            placeholder="Password"
+            className="border px-3 py-2 rounded w-full"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-2 top-2 text-sm text-gray-500"
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
         <button
           type="submit"
           className="bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
@@ -108,7 +118,7 @@ const Register = () => {
         Register with Google
       </button>
 
-      <p className="mt-4 text-sm">
+      <p className="mt-4 text-sm text-center">
         Already have an account?{" "}
         <Link to="/login" className="text-blue-500 hover:underline">
           Login

@@ -12,42 +12,49 @@ import {
 } from "firebase/auth";
 import app from "../firebase/firebase.config"; // default import
 
-// Create context
 export const AuthContext = createContext();
 
-// Initialize Firebase auth
 const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);       // Logged-in user
-  const [loading, setLoading] = useState(true); // Loading state
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Signup with email & password
+  // Email/password signup
   const signUp = async (email, password, displayName, photoURL) => {
     setLoading(true);
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
-      // Update user profile (name, photo)
       await updateProfile(res.user, { displayName, photoURL });
-      setUser({ ...res.user });
-    } catch (error) {
-      console.error("Signup Error:", error);
-      throw error;
+      setUser({
+        uid: res.user.uid,
+        email: res.user.email,
+        displayName: res.user.displayName,
+        photoURL: res.user.photoURL,
+      });
+    } catch (err) {
+      console.error("Signup Error:", err);
+      throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  // Login with email & password
+  // Email/password login
   const login = async (email, password) => {
     setLoading(true);
     try {
       const res = await signInWithEmailAndPassword(auth, email, password);
-      setUser(res.user);
-    } catch (error) {
-      console.error("Login Error:", error);
-      throw error;
+      setUser({
+        uid: res.user.uid,
+        email: res.user.email,
+        displayName: res.user.displayName,
+        photoURL: res.user.photoURL,
+      });
+    } catch (err) {
+      console.error("Login Error:", err);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -58,10 +65,15 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await signInWithPopup(auth, googleProvider);
-      setUser(res.user);
-    } catch (error) {
-      console.error("Google Login Error:", error);
-      throw error;
+      setUser({
+        uid: res.user.uid,
+        email: res.user.email,
+        displayName: res.user.displayName,
+        photoURL: res.user.photoURL,
+      });
+    } catch (err) {
+      console.error("Google Login Error:", err);
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -73,36 +85,33 @@ export const AuthProvider = ({ children }) => {
     try {
       await signOut(auth);
       setUser(null);
-    } catch (error) {
-      console.error("Logout Error:", error);
+    } catch (err) {
+      console.error("Logout Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Listen to auth state changes
+  // Listen for auth changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      if (currentUser) {
+        setUser({
+          uid: currentUser.uid,
+          email: currentUser.email,
+          displayName: currentUser.displayName,
+          photoURL: currentUser.photoURL,
+        });
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
 
-  // Context value
-  const authInfo = {
-    user,
-    loading,
-    signUp,
-    login,
-    loginWithGoogle,
-    logOut,
-  };
+  const authInfo = { user, loading, signUp, login, loginWithGoogle, logOut };
 
-  return (
-    <AuthContext.Provider value={authInfo}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>;
 };

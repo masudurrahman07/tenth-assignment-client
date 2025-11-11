@@ -1,11 +1,13 @@
 // src/components/Navbar.jsx
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleLogout = () => {
     logOut()
@@ -87,33 +89,7 @@ const Navbar = () => {
         <nav className="hidden md:flex space-x-6 items-center">
           <ul className="flex space-x-6">{navLinks}</ul>
 
-          {user ? (
-            <div className="flex items-center space-x-3">
-              {user.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt="user"
-                  title={user.displayName || "User"}
-                  className="w-8 h-8 rounded-full border-2 border-blue-500"
-                />
-              ) : (
-                <span
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-500 text-white font-bold"
-                  title={user.displayName || "User"}
-                >
-                  {user.displayName
-                    ? user.displayName.charAt(0).toUpperCase()
-                    : "U"}
-                </span>
-              )}
-              <button
-                onClick={handleLogout}
-                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
+          {!user ? (
             <div className="flex space-x-3">
               <Link
                 to="/login"
@@ -127,6 +103,42 @@ const Navbar = () => {
               >
                 Register
               </Link>
+            </div>
+          ) : (
+            <div
+              className="relative flex flex-col items-center"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+            >
+              {/* User Photo */}
+              <img
+                src={user.photoURL}
+                alt="user"
+                className="w-10 h-10 rounded-full border-2 border-blue-500 cursor-pointer"
+              />
+
+              {/* Hover Card */}
+              <AnimatePresence>
+                {isHovered && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute top-full mt-2 bg-white text-gray-800 rounded-lg shadow-lg p-3 w-40 border z-20"
+                  >
+                    <p className="font-semibold text-sm mb-2 text-center">
+                      {user.displayName || "User"}
+                    </p>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full bg-blue-500 text-white py-1 rounded hover:bg-blue-600 transition"
+                    >
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
         </nav>

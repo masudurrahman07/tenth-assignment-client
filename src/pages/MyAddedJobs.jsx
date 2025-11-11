@@ -3,6 +3,8 @@ import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import { motion } from "framer-motion";
 
 const MyAddedJobs = () => {
   const { user } = useContext(AuthContext);
@@ -27,18 +29,28 @@ const MyAddedJobs = () => {
   }, [user.email]);
 
   const handleDelete = async (jobId) => {
-    if (!window.confirm("Are you sure you want to delete this job?")) return;
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    });
 
-    try {
-      const res = await fetch(`http://localhost:3000/jobs/${jobId}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed to delete job");
+    if (result.isConfirmed) {
+      try {
+        const res = await fetch(`http://localhost:3000/jobs/${jobId}`, {
+          method: "DELETE",
+        });
+        if (!res.ok) throw new Error("Failed to delete job");
 
-      setJobs((prev) => prev.filter((job) => job._id !== jobId));
-      toast.success("Job deleted successfully");
-    } catch (err) {
-      toast.error(err.message);
+        setJobs((prev) => prev.filter((job) => job._id !== jobId));
+        Swal.fire("Deleted!", "Job has been deleted.", "success");
+      } catch (err) {
+        Swal.fire("Error!", err.message, "error");
+      }
     }
   };
 
@@ -50,12 +62,14 @@ const MyAddedJobs = () => {
   return (
     <div className="max-w-6xl mx-auto p-6 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
       {jobs.map((job) => (
-        <div
+        <motion.div
           key={job._id}
-          className="border p-4 rounded shadow hover:shadow-lg transition"
+          whileHover={{ scale: 1.03, boxShadow: "0px 10px 20px rgba(0,0,0,0.2)" }}
+          transition={{ duration: 0.2 }}
+          className="border p-4 rounded shadow flex flex-col"
         >
           <img
-            src={job.coverImage}
+            src={job.coverImage || "https://via.placeholder.com/400x200"}
             alt={job.title}
             className="w-full h-40 object-cover rounded mb-2"
           />
@@ -66,9 +80,11 @@ const MyAddedJobs = () => {
               ? job.summary.slice(0, 80) + "..."
               : job.summary}
           </p>
-          <p className="text-sm text-gray-500 mb-2">Posted At: {new Date(job.postedAt).toLocaleDateString()}</p>
+          <p className="text-sm text-gray-500 mb-2">
+            Posted At: {new Date(job.postedAt).toLocaleDateString()}
+          </p>
 
-          <div className="flex gap-2 mt-2">
+          <div className="flex gap-2 mt-auto">
             <Link
               to={`/updateJob/${job._id}`}
               className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition"
@@ -82,7 +98,7 @@ const MyAddedJobs = () => {
               Delete
             </button>
           </div>
-        </div>
+        </motion.div>
       ))}
     </div>
   );

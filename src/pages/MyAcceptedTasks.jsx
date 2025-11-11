@@ -27,30 +27,24 @@ const MyAcceptedTasks = () => {
     fetchAcceptedJobs();
   }, [user.email]);
 
-  const handleRemoveJob = async (jobId) => {
-    try {
-      const res = await fetch(`http://localhost:3000/jobs/${jobId}`);
-      if (!res.ok) throw new Error("Job not found");
-      const job = await res.json();
+ const handleRemoveJob = async (jobId) => {
+  try {
+    const res = await fetch(`http://localhost:3000/jobs/${jobId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ removeUser: user.email }),
+    });
 
-      // Remove user from acceptedBy
-      const updatedAcceptedBy = job.acceptedBy.filter((email) => email !== user.email);
+    if (!res.ok) throw new Error("Failed to update job");
 
-      const updateRes = await fetch(`http://localhost:3000/jobs/${jobId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...job, acceptedBy: updatedAcceptedBy }),
-      });
+    // Remove from UI immediately
+    setJobs((prev) => prev.filter((j) => j._id !== jobId));
+    toast.success("Task removed successfully!");
+  } catch (err) {
+    toast.error(err.message);
+  }
+};
 
-      if (!updateRes.ok) throw new Error("Failed to update job");
-
-      // Update UI
-      setJobs((prev) => prev.filter((j) => j._id !== jobId));
-      toast.success("Job removed successfully");
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
 
   if (loading) return <LoadingSpinner />;
 
@@ -82,13 +76,13 @@ const MyAcceptedTasks = () => {
               onClick={() => handleRemoveJob(job._id)}
               className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
             >
-              ❌ Cancel
+               Cancel
             </button>
             <button
               onClick={() => handleRemoveJob(job._id)}
               className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition"
             >
-              ✅ Done
+               Done
             </button>
           </div>
         </div>
