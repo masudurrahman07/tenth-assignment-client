@@ -1,8 +1,9 @@
-// src/components/Footer.jsx
+
 import React from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import { FaFacebook, FaTwitter, FaInstagram, FaGithub } from "react-icons/fa";
+import { Link } from "react-router-dom";
+
 
 const Footer = () => {
   return (
@@ -10,8 +11,8 @@ const Footer = () => {
       className="bg-linear-to-r from-blue-700 via-sky-600 to-blue-500 text-white py-10 mt-10"
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-    >
+      transition={{ duration: 0.8, ease: "easeOut" }}>
+
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
         <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
           <h2 className="text-2xl font-bold mb-3">Freelance<span className="text-blue-200">Hub</span></h2>

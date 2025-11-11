@@ -4,7 +4,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { ThemeProvider } from "./context/ThemeContext"
+
 
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
@@ -14,16 +14,16 @@ import AllJobs from "./pages/AllJobs";
 import AddJob from "./pages/AddJob";
 import MyAddedJobs from "./pages/MyAddedJobs";
 import MyAcceptedTasks from "./pages/MyAcceptedTasks";
+import ErrorPage from "./pages/ErrorPage";
+import PrivateRoute from "./components/PrivateRoutes"; 
 import JobDetails from "./pages/JobDetails";
 import UpdateJob from "./pages/UpdateJob";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import ErrorPage from "./pages/ErrorPage";
-import PrivateRoute from "./components/PrivateRoutes"; 
 
 const App = () => {
   return (
-    <ThemeProvider>
+    
     <AuthProvider>
        
       <Router>
@@ -40,43 +40,44 @@ const App = () => {
                   <PrivateRoute>
                     <AddJob />
                   </PrivateRoute>
-                }
-              />
+                }/>
+
               <Route
                 path="/myAddedJobs"
                 element={
                   <PrivateRoute>
                     <MyAddedJobs />
                   </PrivateRoute>
-                }
-              />
+                }/>
+
               <Route
                 path="/my-accepted-tasks"
                 element={
                   <PrivateRoute>
                     <MyAcceptedTasks />
                   </PrivateRoute>
-                }
-              />
+                }/>
+
               <Route
                 path="/allJobs/:id"
                 element={
                   <PrivateRoute>
                     <JobDetails />
                   </PrivateRoute>
-                }
-              />
+                }/>
+
               <Route
                 path="/updateJob/:id"
                 element={
                   <PrivateRoute>
                     <UpdateJob />
                   </PrivateRoute>
-                }
-              />
+                }/>
+
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="*" element={<ErrorPage />} />
+              
             </Routes>
           </main>
 
@@ -87,7 +88,7 @@ const App = () => {
       </Router>
    
     </AuthProvider>
-       </ThemeProvider>
+      
   );
 };
 export default App;

@@ -1,4 +1,4 @@
-// src/context/AuthContext.jsx
+
 import React, { createContext, useEffect, useState } from "react";
 import {
   getAuth,
@@ -10,7 +10,8 @@ import {
   signOut,
   updateProfile,
 } from "firebase/auth";
-import app from "../firebase/firebase.config"; // default import
+
+import app from "../firebase/firebase.config"; 
 
 export const AuthContext = createContext();
 
@@ -21,27 +22,32 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Email/password signup
+  // signup with email password
   const signUp = async (email, password, displayName, photoURL) => {
     setLoading(true);
     try {
+
       const res = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(res.user, { displayName, photoURL });
+
       setUser({
         uid: res.user.uid,
         email: res.user.email,
         displayName: res.user.displayName,
         photoURL: res.user.photoURL,
       });
-    } catch (err) {
+    }
+     catch (err) {
       console.error("Signup Error:", err);
       throw err;
-    } finally {
+    }
+     finally {
       setLoading(false);
     }
+    
   };
 
-  // Email/password login
+  // email/password login
   const login = async (email, password) => {
     setLoading(true);
     try {
@@ -51,18 +57,20 @@ export const AuthProvider = ({ children }) => {
         email: res.user.email,
         displayName: res.user.displayName,
         photoURL: res.user.photoURL,
-      });
-    } catch (err) {
+      });} 
+
+      catch (err) {
       console.error("Login Error:", err);
-      throw err;
-    } finally {
+      throw err;} 
+      finally {
       setLoading(false);
     }
   };
 
-  // Google login
+  // login with google
   const loginWithGoogle = async () => {
     setLoading(true);
+
     try {
       const res = await signInWithPopup(auth, googleProvider);
       setUser({
@@ -70,8 +78,8 @@ export const AuthProvider = ({ children }) => {
         email: res.user.email,
         displayName: res.user.displayName,
         photoURL: res.user.photoURL,
-      });
-    } catch (err) {
+      });} 
+      catch (err) {
       console.error("Google Login Error:", err);
       throw err;
     } finally {
@@ -79,20 +87,23 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout
+  // logout function
   const logOut = async () => {
     setLoading(true);
+
     try {
       await signOut(auth);
       setUser(null);
-    } catch (err) {
+    } 
+    catch (err) {
       console.error("Logout Error:", err);
-    } finally {
+    } 
+    finally {
       setLoading(false);
     }
   };
 
-  // Listen for auth changes
+  
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
@@ -102,16 +113,21 @@ export const AuthProvider = ({ children }) => {
           displayName: currentUser.displayName,
           photoURL: currentUser.photoURL,
         });
-      } else {
+      } 
+      else {
         setUser(null);
       }
-      setLoading(false);
-    });
+      setLoading(false);});
 
     return () => unsubscribe();
   }, []);
 
-  const authInfo = { user, loading, signUp, login, loginWithGoogle, logOut };
+  const authInfo = { user, 
+    loading, 
+    signUp, 
+    login, 
+    loginWithGoogle, 
+    logOut };
 
   return <AuthContext.Provider value={authInfo}>{children}</AuthContext.Provider>;
 };
