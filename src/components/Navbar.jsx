@@ -117,6 +117,8 @@ const Navbar = () => {
                 className="w-10 h-10 rounded-full border-2 border-blue-500 cursor-pointer"
               />
 
+              
+
               {/* Hover Card */}
               <AnimatePresence>
                 {isHovered && (

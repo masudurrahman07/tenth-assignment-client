@@ -27,31 +27,29 @@ const JobDetails = () => {
     fetchJob();
   }, [id]);
 
-  const handleAcceptJob = async () => {
-    if (user.email === job.userEmail) {
-      toast.error("You cannot accept your own job");
-      return;
-    }
+ const handleAcceptJob = async () => {
+  if (!user) {
+    toast.warning("Please log in to accept a job.");
+    navigate("/login");
+    return;
+  }
 
-    try {
-      const updatedJob = {
-        ...job,
-        acceptedBy: job.acceptedBy ? [...job.acceptedBy, user.email] : [user.email],
-      };
+  try {
+    const res = await fetch(`http://localhost:3000/jobs/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ acceptedBy: [user.email] }),
+    });
 
-      const res = await fetch(`http://localhost:3000/jobs/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedJob),
-      });
+    if (!res.ok) throw new Error("Failed to accept job");
 
-      if (!res.ok) throw new Error("Failed to accept job");
-      toast.success("Job accepted!");
-      navigate("/my-accepted-tasks");
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
+    toast.success("Job accepted successfully!");
+    navigate("/my-accepted-tasks");
+  } catch (err) {
+    toast.error(err.message);
+  }
+};
+
 
   if (loading) return <LoadingSpinner />;
   if (!job) return <p className="text-center mt-10">Job not found</p>;

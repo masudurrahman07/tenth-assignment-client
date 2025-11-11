@@ -4,6 +4,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ThemeProvider } from "./context/ThemeContext"
 
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
@@ -22,7 +23,9 @@ import PrivateRoute from "./components/PrivateRoutes";
 
 const App = () => {
   return (
+    <ThemeProvider>
     <AuthProvider>
+       
       <Router>
         <div className="flex flex-col min-h-screen">
           <Navbar />
@@ -82,7 +85,9 @@ const App = () => {
 
         <ToastContainer position="top-center" autoClose={2000} />
       </Router>
+   
     </AuthProvider>
+       </ThemeProvider>
   );
 };
 export default App;
