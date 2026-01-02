@@ -5,7 +5,7 @@ const JobCard = ({ job, currentUserEmail }) => {
   const isOwner = currentUserEmail === job.userEmail;
 
   return (
-    <div className="group bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-transform transition-shadow duration-300 hover:-translate-y-1 flex flex-col">
+    <div className="group bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-shadow duration-300 hover:-translate-y-1 flex flex-col">
       
       {/* Image */}
       <div className="relative overflow-hidden">
