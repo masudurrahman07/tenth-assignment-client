@@ -8,11 +8,7 @@ import { FiMoon, FiSun } from "react-icons/fi";
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
   const [isHovered, setIsHovered] = useState(false);
-  
-  // Initialize theme from localStorage or default to light
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("theme") || "light";
-  });
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "light");
 
   const handleLogout = () => {
     logOut()
@@ -22,19 +18,13 @@ const Navbar = () => {
 
   useEffect(() => {
     const html = document.documentElement;
-    if (theme === "dark") {
-      html.classList.add("dark");
-    } else {
-      html.classList.remove("dark");
-    }
-    // Set data-theme for DaisyUI or other CSS libraries
-    html.setAttribute("data-theme", theme); 
+    if (theme === "dark") html.classList.add("dark");
+    else html.classList.remove("dark");
+    html.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
-  };
+  const toggleTheme = () => setTheme((prev) => (prev === "light" ? "dark" : "light"));
 
   const isDark = theme === "dark";
 
@@ -43,31 +33,33 @@ const Navbar = () => {
       {[
         { name: "Home", path: "/" },
         { name: "All Jobs", path: "/allJobs" },
+        !user && { name: "Features", path: "/features" }, // Features only when logged out
         { name: "Add Job", path: "/addJob", auth: true },
         { name: "My Added Jobs", path: "/myAddedJobs", auth: true },
         { name: "My Accepted Tasks", path: "/my-accepted-tasks", auth: true },
-      ].map((link) => {
-        if (link.auth && !user) return null;
-
-        return (
-          <li key={link.name}>
-            <NavLink
-              to={link.path}
-              className={({ isActive }) =>
-                isActive
-                  ? "font-semibold text-white px-3 py-1 rounded-lg bg-linear-to-r from-green-400 via-green-500 to-green-600 transition-all duration-200"
-                  : `px-3 py-1 rounded-lg transition-all duration-200 ${
-                      isDark
-                        ? "text-gray-200 hover:text-white hover:bg-gray-800"
-                        : "text-white/90 hover:text-white hover:bg-white/10"
-                    }`
-              }
-            >
-              {link.name}
-            </NavLink>
-          </li>
-        );
-      })}
+      ]
+        .filter(Boolean) // remove null / false entries
+        .map((link) => {
+          if (link.auth && !user) return null;
+          return (
+            <li key={link.name}>
+              <NavLink
+                to={link.path}
+                className={({ isActive }) =>
+                  isActive
+                    ? "font-semibold text-white px-3 py-1 rounded-lg bg-linear-to-r from-green-400 via-green-500 to-green-600 transition-all duration-200"
+                    : `px-3 py-1 rounded-lg transition-all duration-200 ${
+                        isDark
+                          ? "text-gray-200 hover:text-white hover:bg-gray-800"
+                          : "text-white/90 hover:text-white hover:bg-white/10"
+                      }`
+                }
+              >
+                {link.name}
+              </NavLink>
+            </li>
+          );
+        })}
     </>
   );
 
@@ -93,12 +85,12 @@ const Navbar = () => {
         <nav className="hidden md:flex items-center space-x-6">
           <ul className="flex items-center space-x-2">{navLinks}</ul>
 
-          {/* Theme Toggle Button */}
+          {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
             className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 border ${
-              isDark 
-                ? "bg-gray-900 border-gray-700 text-yellow-400 hover:bg-gray-800" 
+              isDark
+                ? "bg-gray-900 border-gray-700 text-yellow-400 hover:bg-gray-800"
                 : "bg-white/10 border-white/20 text-white hover:bg-white/20"
             }`}
             aria-label="Toggle theme"
@@ -136,7 +128,7 @@ const Navbar = () => {
               onMouseLeave={() => setIsHovered(false)}
             >
               <img
-                src={user.photoURL || "https://via.placeholder.com/40" }
+                src={user.photoURL || "https://via.placeholder.com/40"}
                 alt="user"
                 className={`w-10 h-10 rounded-full border-2 cursor-pointer transition-all ${
                   isDark ? "border-[#36e2c3]" : "border-white"
@@ -158,9 +150,19 @@ const Navbar = () => {
                     <p className="font-bold text-sm mb-3 truncate px-1">
                       {user.displayName || "User"}
                     </p>
+
+                    {/* Dashboard Button */}
+                    <Link
+                      to="/dashboard"
+                      className="w-full block text-center py-2 mb-2 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition-colors"
+                    >
+                      Dashboard
+                    </Link>
+
+                    {/* Logout Button */}
                     <button
                       onClick={handleLogout}
-                      className="w-full py-2 rounded-lg bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors shadow-md"
+                      className="w-full py-2 rounded-lg bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors"
                     >
                       Logout
                     </button>
@@ -171,7 +173,7 @@ const Navbar = () => {
           )}
         </nav>
 
-        {/* Mobile Toggle & Menu */}
+        {/* Mobile Menu */}
         <div className="md:hidden flex items-center space-x-3">
           <button
             onClick={toggleTheme}
@@ -181,26 +183,55 @@ const Navbar = () => {
           >
             {isDark ? <FiSun size={18} /> : <FiMoon size={18} />}
           </button>
-          
+
           <details className="dropdown dropdown-end">
-            <summary className={`btn btn-sm h-10 border-none px-4 ${
-              isDark ? "bg-gray-800 text-white" : "bg-white/20 text-white"
-            }`}>
+            <summary
+              className={`btn btn-sm h-10 border-none px-4 ${
+                isDark ? "bg-gray-800 text-white" : "bg-white/20 text-white"
+              }`}
+            >
               Menu
             </summary>
-            <ul className={`p-4 shadow-2xl menu dropdown-content z-50 rounded-xl w-64 mt-4 ${
-              isDark ? "bg-gray-950 border border-gray-800 text-gray-100" : "bg-white text-gray-800 border border-gray-100"
-            }`}>
+            <ul
+              className={`p-4 shadow-2xl menu dropdown-content z-50 rounded-xl w-64 mt-4 ${
+                isDark
+                  ? "bg-gray-950 border border-gray-800 text-gray-100"
+                  : "bg-white text-gray-800 border border-gray-100"
+              }`}
+            >
               {navLinks}
               <hr className="my-2 border-gray-200 dark:border-gray-800" />
               {user ? (
-                <li>
-                  <button onClick={handleLogout} className="text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-900/20">Logout</button>
-                </li>
+                <>
+                  <li>
+                    <Link
+                      to="/dashboard"
+                      className="block w-full text-center py-2 mb-2 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition-colors"
+                    >
+                      Dashboard
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-center py-2 rounded-lg"
+                    >
+                      Logout
+                    </button>
+                  </li>
+                </>
               ) : (
                 <>
-                  <li><Link to="/login" className="hover:bg-gray-100 dark:hover:bg-gray-800">Login</Link></li>
-                  <li><Link to="/register" className="hover:bg-gray-100 dark:hover:bg-gray-800">Register</Link></li>
+                  <li>
+                    <Link to="/login" className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                      Login
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/register" className="hover:bg-gray-100 dark:hover:bg-gray-800">
+                      Register
+                    </Link>
+                  </li>
                 </>
               )}
             </ul>

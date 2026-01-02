@@ -1,46 +1,63 @@
-
 // src/App.jsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 import { AuthProvider } from "./context/AuthContext";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer"; 
+import Footer from "./components/Footer";
+
 import Home from "./pages/Home";
+import Features from "./pages/Features";
 import AllJobs from "./pages/AllJobs";
 import AddJob from "./pages/AddJob";
 import MyAddedJobs from "./pages/MyAddedJobs";
 import MyAcceptedTasks from "./pages/MyAcceptedTasks";
-import ErrorPage from "./pages/ErrorPage";
-import PrivateRoute from "./components/PrivateRoutes"; 
 import JobDetails from "./pages/JobDetails";
 import UpdateJob from "./pages/UpdateJob";
+import Dashboard from "./pages/Dashboard";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ErrorPage from "./pages/ErrorPage";
+
+import PrivateRoute from "./components/PrivateRoutes";
 
 const App = () => {
   return (
-    
     <AuthProvider>
-       
       <Router>
-  <div className="flex flex-col min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+        <div className="flex flex-col min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
           <Navbar />
 
           <main className="grow">
             <Routes>
+              {/* Public Routes */}
               <Route path="/" element={<Home />} />
+              <Route path="/features" element={<Features />} />
               <Route path="/allJobs" element={<AllJobs />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+
+              {/* Protected Routes */}
+              <Route
+                path="/dashboard"
+                element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+
               <Route
                 path="/addJob"
                 element={
                   <PrivateRoute>
                     <AddJob />
                   </PrivateRoute>
-                }/>
+                }
+              />
 
               <Route
                 path="/myAddedJobs"
@@ -48,7 +65,8 @@ const App = () => {
                   <PrivateRoute>
                     <MyAddedJobs />
                   </PrivateRoute>
-                }/>
+                }
+              />
 
               <Route
                 path="/my-accepted-tasks"
@@ -56,7 +74,8 @@ const App = () => {
                   <PrivateRoute>
                     <MyAcceptedTasks />
                   </PrivateRoute>
-                }/>
+                }
+              />
 
               <Route
                 path="/allJobs/:id"
@@ -64,7 +83,8 @@ const App = () => {
                   <PrivateRoute>
                     <JobDetails />
                   </PrivateRoute>
-                }/>
+                }
+              />
 
               <Route
                 path="/updateJob/:id"
@@ -72,12 +92,11 @@ const App = () => {
                   <PrivateRoute>
                     <UpdateJob />
                   </PrivateRoute>
-                }/>
+                }
+              />
 
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              {/* Fallback */}
               <Route path="*" element={<ErrorPage />} />
-              
             </Routes>
           </main>
 
@@ -86,9 +105,8 @@ const App = () => {
 
         <ToastContainer position="top-center" autoClose={2000} />
       </Router>
-   
     </AuthProvider>
-      
   );
 };
+
 export default App;
