@@ -1,13 +1,19 @@
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: light --default, dark --prefersdark;
+
+/* This tells Tailwind v4 how to handle the .dark class */
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: white;
+  --foreground: #111827;
 }
 
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+.dark {
+  --background: #030712;
+  --foreground: #f3f4f6;
+}
 
-
-
-
-* {
-  font-family: 'Inter', sans-serif;
+body {
+  background-color: var(--background);
+  color: var(--foreground);
 }

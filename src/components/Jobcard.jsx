@@ -1,41 +1,62 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 
 const JobCard = ({ job, currentUserEmail }) => {
-  const isOwner = currentUserEmail === job.userEmail; 
+  const isOwner = currentUserEmail === job.userEmail;
 
   return (
-    <div className="border rounded-lg shadow-sm overflow-hidden hover:shadow-md duration-200 transition-shadow ">
-      <img
-        src={job.coverImage}
-        alt=""
-        className="w-full h-48 object-cover"/>
+    <div className="group bg-white dark:bg-gray-900 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-transform transition-shadow duration-300 hover:-translate-y-1 flex flex-col">
+      
+      {/* Image */}
+      <div className="relative overflow-hidden">
+        <img
+          src={job.coverImage}
+          alt={job.title}
+          loading="lazy"
+          className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        <span className="absolute top-3 left-3 bg-white/90 dark:bg-gray-800/90 text-xs font-medium text-gray-800 dark:text-gray-200 px-3 py-1 rounded-full backdrop-blur">
+          {job.category}
+        </span>
+      </div>
 
-      <div className="p-4">
-        <h2 className="text-lg font-semibold text-gray-800">{job.title}</h2>
-        <p className="text-sm text-gray-500 mb-1">Category: {job.category}</p>
+      {/* Content */}
+      <div className="p-5 flex flex-col h-full">
+        <h2 className="text-lg font-semibold mb-1 text-gray-900 dark:text-white line-clamp-2">
+          {job.title}
+        </h2>
+        <p className="text-sm mb-4 text-gray-600 dark:text-gray-300 line-clamp-3">
+          {job.summary}
+        </p>
 
-        <p className="text-sm mb-3 text-gray-600 ">{job.summary.slice(0, 80)}...</p>
-        <p className="text-xs text-gray-400 mb-3">Posted by: {job.postedBy}</p>
+        <div className="mt-auto">
+          <p className="text-xs mb-4 text-gray-400 dark:text-gray-500">
+            Posted by{" "}
+            <span className="font-medium text-gray-600 dark:text-gray-300">
+              {job.postedBy}
+            </span>
+          </p>
 
-        <div className="flex gap-2 flex-wrap">
-          <Link
-            to={`/allJobs/${job._id}`}
-            className="inline-block bg-blue-500 text-white text-sm py-1 px-3  rounded hover:bg-blue-600 transition">
-            View Details</Link>
-
-          
-          {!isOwner && currentUserEmail && (
+          <div className="flex gap-2">
             <Link
               to={`/allJobs/${job._id}`}
-              className="inline-block bg-green-500 text-white text-sm px-3 py-1 rounded hover:bg-green-600 transition">
-              Accept Job</Link>)}
-        </div>
+              className="flex-1 text-center bg-linear-to-r from-blue-700 via-sky-600 to-blue-500 text-white text-sm font-medium py-2 rounded-lg transition-colors duration-200"
+            >
+              View Details
+            </Link>
 
+            {!isOwner && currentUserEmail && (
+              <Link
+                to={`/allJobs/${job._id}`}
+                className="flex-1 text-center bg-linear-to-r from-green-400 via-green-500 to-green-600  text-white text-sm font-medium py-2 rounded-lg transition-colors duration-200"
+              >
+                Accept
+              </Link>
+            )}
+          </div>
+        </div>
       </div>
     </div>
-    
   );
 };
 

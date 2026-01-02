@@ -3,200 +3,210 @@ import { Link, NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { AuthContext } from "../context/AuthContext";
+import { FiMoon, FiSun } from "react-icons/fi";
 
 const Navbar = () => {
   const { user, logOut } = useContext(AuthContext);
   const [isHovered, setIsHovered] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  
+  // Initialize theme from localStorage or default to light
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("theme") || "light";
+  });
 
   const handleLogout = () => {
     logOut()
       .then(() => toast.success("Logged out successfully"))
-      .catch(() => toast.error("Logout failed"));};
+      .catch(() => toast.error("Logout failed"));
+  };
 
   useEffect(() => {
-    const html = document.querySelector("html");
-    html.setAttribute("data-theme", theme);
-    localStorage.setItem("theme", theme);}, 
-    [theme]);
+    const html = document.documentElement;
+    if (theme === "dark") {
+      html.classList.add("dark");
+    } else {
+      html.classList.remove("dark");
+    }
+    // Set data-theme for DaisyUI or other CSS libraries
+    html.setAttribute("data-theme", theme); 
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
-  const handleTheme = (checked) => {
-    setTheme(checked ? "dark" : "light");};
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
 
   const isDark = theme === "dark";
 
   const navLinks = (
     <>
-      {/* toggle theme */}
-      <li>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input
-            onChange={(e) => handleTheme(e.target.checked)}
-            type="checkbox"
-            checked={isDark}
-            className="toggle"/>
+      {[
+        { name: "Home", path: "/" },
+        { name: "All Jobs", path: "/allJobs" },
+        { name: "Add Job", path: "/addJob", auth: true },
+        { name: "My Added Jobs", path: "/myAddedJobs", auth: true },
+        { name: "My Accepted Tasks", path: "/my-accepted-tasks", auth: true },
+      ].map((link) => {
+        if (link.auth && !user) return null;
 
-          <span
-            className={`text-sm ${isDark ? "text-gray-200" : "text-gray-800"}`}>
-            {isDark ? "Dark" : "Light"}
-          </span>
-
-        </label>
-      </li>
-
-      <li>
-        <NavLink
-          to="/" className={({ isActive }) =>
-            isActive ? "text-blue-400 font-semibold"
-              : `${isDark  ? "text-gray-200 hover:text-blue-400"
-                    : "text-gray-800 hover:text-blue-500"
-                }`}>Home</NavLink>
-      </li>
-
-      <li>
-
-        <NavLink to="/allJobs"
-          className={({ isActive }) =>
-            isActive  ? "text-blue-400 font-semibold"
-              : `${isDark? "text-gray-200 hover:text-blue-400"
-                    : "text-gray-800 hover:text-blue-500"}`}>All Jobs</NavLink>
-      </li>
-
-      {user && (
-        <>
-          <li>
+        return (
+          <li key={link.name}>
             <NavLink
-              to="/addJob" className={({ isActive }) =>  isActive
-                  ? "text-blue-400 font-semibold"
-                  : `${ isDark  ? "text-gray-200 hover:text-blue-400"
-                        : "text-gray-800 hover:text-blue-500"}`}>
-              Add Job
-            </NavLink>
-          </li>
-          <li>
-
-            <NavLink
-              to="/myAddedJobs"
+              to={link.path}
               className={({ isActive }) =>
                 isActive
-                  ? "text-blue-400 font-semibold"
-                  : `${
-                      isDark  ? "text-gray-200 hover:text-blue-400"
-                        : "text-gray-800 hover:text-blue-500"}`}>My Added Jobs </NavLink>
-          </li>
-
-          <li>
-            <NavLink
-              to="/my-accepted-tasks"  className={({ isActive }) =>  isActive  ? "text-blue-400 font-semibold"
-                  : `${  isDark  ? "text-gray-200 hover:text-blue-400"
-                        : "text-gray-800 hover:text-blue-500"
-                    }`}> My Accepted Tasks
+                  ? "font-semibold text-white px-3 py-1 rounded-lg bg-linear-to-r from-green-400 via-green-500 to-green-600 transition-all duration-200"
+                  : `px-3 py-1 rounded-lg transition-all duration-200 ${
+                      isDark
+                        ? "text-gray-200 hover:text-white hover:bg-gray-800"
+                        : "text-white/90 hover:text-white hover:bg-white/10"
+                    }`
+              }
+            >
+              {link.name}
             </NavLink>
           </li>
-        </>
-      )}
+        );
+      })}
     </>
   );
 
   return (
     <header
       className={`sticky top-0 z-50 shadow-md transition-colors duration-300 ${
-        isDark ? "bg-gray-900 text-gray-100" : "bg-white text-gray-800" }`}>
-
-      <div className="navbar max-w-6xl mx-auto flex justify-between items-center p-4">
-        
+        isDark
+          ? "bg-gray-950 border-b border-gray-800 text-gray-100"
+          : "bg-linear-to-r from-blue-700 via-sky-600 to-blue-500 text-white"
+      }`}
+    >
+      <div className="navbar max-w-7xl mx-auto flex justify-between items-center p-4">
+        {/* Logo */}
         <Link
           to="/"
-          className={`text-2xl font-bold transition ${ isDark  ? "text-blue-400 hover:text-blue-300" : "text-blue-600 hover:text-blue-700"
-             }`}>Freelance
-          <span className={isDark ? "text-gray-200" : "text-gray-800"}>  Hub  </span>
+          className="text-2xl font-bold flex items-center transition-transform hover:scale-105"
+        >
+          <span className={isDark ? "text-[#36e2c3]" : "text-white"}>Freelance</span>
+          <span className={isDark ? "text-white" : "text-black/80"}>Hub</span>
         </Link>
 
-        {/* desktop menu here */}
-        <nav className="hidden md:flex space-x-6 items-center">
-          <ul className="flex space-x-6">{navLinks}</ul>
+        {/* Desktop Menu */}
+        <nav className="hidden md:flex items-center space-x-6">
+          <ul className="flex items-center space-x-2">{navLinks}</ul>
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className={`flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 border ${
+              isDark 
+                ? "bg-gray-900 border-gray-700 text-yellow-400 hover:bg-gray-800" 
+                : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+            }`}
+            aria-label="Toggle theme"
+          >
+            {isDark ? <FiSun size={20} /> : <FiMoon size={20} />}
+          </button>
 
           {!user ? (
             <div className="flex space-x-3">
               <Link
-                to="/login"  className={`px-3 py-1 border rounded transition ${  isDark  ? "border-blue-400 text-blue-400 hover:bg-blue-500 hover:text-white"
-                    : "border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
-                }`}>  Login  </Link>
-
-              <Link  to="/register"  className={`px-3 py-1 rounded transition ${  isDark
-                    ? "bg-blue-500 text-white hover:bg-blue-600"
-                    : "bg-blue-500 text-white hover:bg-blue-600"}`}>Register </Link>
+                to="/login"
+                className={`px-4 py-1.5 border rounded-lg font-medium transition-all ${
+                  isDark
+                    ? "border-gray-700 text-gray-300 hover:bg-gray-800"
+                    : "border-white/40 text-white hover:bg-white/10"
+                }`}
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className={`px-4 py-1.5 rounded-lg font-medium transition-all shadow-sm ${
+                  isDark
+                    ? "bg-[#36e2c3] text-gray-950 hover:bg-[#2bc9ad]"
+                    : "bg-white text-blue-600 hover:bg-gray-100"
+                }`}
+              >
+                Register
+              </Link>
             </div>
           ) : (
             <div
-              className="relative flex flex-col items-center"
+              className="relative"
               onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}>
-
+              onMouseLeave={() => setIsHovered(false)}
+            >
               <img
-                src={user.photoURL}
+                src={user.photoURL || "https://via.placeholder.com/40" }
                 alt="user"
-                className="w-10 h-10 rounded-full border-2 border-blue-500 cursor-pointer"/>
+                className={`w-10 h-10 rounded-full border-2 cursor-pointer transition-all ${
+                  isDark ? "border-[#36e2c3]" : "border-white"
+                }`}
+              />
 
               <AnimatePresence>
                 {isHovered && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
-                    className={`absolute top-full mt-2 rounded-lg shadow-lg p-3 w-40 border z-20 ${
+                    exit={{ opacity: 0, y: 10 }}
+                    className={`absolute right-0 mt-2 w-48 p-4 rounded-xl border shadow-2xl z-20 ${
                       isDark
-                        ? "bg-gray-800 text-gray-100 border-gray-700"
-                        : "bg-white text-gray-800 border-gray-200"}`}>
-
-                    <p className="font-semibold text-sm mb-2 text-center">{user.displayName || "User"}</p>
-
-                    <button  onClick={handleLogout}  className={`w-full py-1 rounded transition ${
-                        isDark  ? "bg-blue-600 text-white hover:bg-blue-500"
-                          : "bg-blue-500 text-white hover:bg-blue-600"}`}>Logout </button>
-                  </motion.div>)}
-
+                        ? "bg-gray-900 text-white border-gray-800"
+                        : "bg-white text-gray-800 border-gray-100"
+                    }`}
+                  >
+                    <p className="font-bold text-sm mb-3 truncate px-1">
+                      {user.displayName || "User"}
+                    </p>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full py-2 rounded-lg bg-red-500 text-white text-sm font-bold hover:bg-red-600 transition-colors shadow-md"
+                    >
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
               </AnimatePresence>
-            </div> )}
+            </div>
+          )}
         </nav>
 
-        {/* mobile menu */}
-        <div className="md:hidden">
-          <details className="dropdown">
-
-            <summary  className={`m-1 btn border-none ${
-                isDark  ? "bg-blue-600 text-white hover:bg-blue-500"
-                  : "bg-blue-500 text-white hover:bg-blue-600"}`}>Menu
+        {/* Mobile Toggle & Menu */}
+        <div className="md:hidden flex items-center space-x-3">
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-lg border ${
+              isDark ? "bg-gray-900 border-gray-700 text-yellow-400" : "bg-white/10 border-white/20 text-white"
+            }`}
+          >
+            {isDark ? <FiSun size={18} /> : <FiMoon size={18} />}
+          </button>
+          
+          <details className="dropdown dropdown-end">
+            <summary className={`btn btn-sm h-10 border-none px-4 ${
+              isDark ? "bg-gray-800 text-white" : "bg-white/20 text-white"
+            }`}>
+              Menu
             </summary>
-
-            <ul
-              className={`p-2 shadow menu dropdown-content z-10 rounded-box w-52 ${
-                isDark ? "bg-gray-900 text-gray-100" : "bg-white text-gray-800"}`}>
-
+            <ul className={`p-4 shadow-2xl menu dropdown-content z-50 rounded-xl w-64 mt-4 ${
+              isDark ? "bg-gray-950 border border-gray-800 text-gray-100" : "bg-white text-gray-800 border border-gray-100"
+            }`}>
               {navLinks}
+              <hr className="my-2 border-gray-200 dark:border-gray-800" />
               {user ? (
                 <li>
-                  <button
-                    onClick={handleLogout}
-                    className="text-red-500 hover:text-red-600"> Logout</button> </li>
+                  <button onClick={handleLogout} className="text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-900/20">Logout</button>
+                </li>
               ) : (
                 <>
-                  <li>
-                    <Link to="/login">Login</Link>
-                  </li>
-                  <li>
-                    <Link to="/register">Register</Link>
-                  </li>
-                </>)}
-
+                  <li><Link to="/login" className="hover:bg-gray-100 dark:hover:bg-gray-800">Login</Link></li>
+                  <li><Link to="/register" className="hover:bg-gray-100 dark:hover:bg-gray-800">Register</Link></li>
+                </>
+              )}
             </ul>
-
           </details>
-
         </div>
       </div>
-
     </header>
   );
 };
