@@ -71,11 +71,10 @@ const Features = () => {
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-4xl mx-auto overflow-hidden rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800"
-      >
-        {/* Header Section with your signature gradient */}
+        className="max-w-4xl mx-auto overflow-hidden rounded-3xl shadow-2xl border border-gray-100 dark:border-gray-800" >
+   
         <div className="bg-linear-to-br from-green-400 via-green-500 to-blue-600 p-10 text-center relative overflow-hidden">
-          {/* Decorative Circle */}
+   
           <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
 
           <div className="relative z-10">
@@ -90,25 +89,19 @@ const Features = () => {
             </div>
 
             <h2 className="text-5xl font-black text-white mb-4 drop-shadow-md">
-              Work reimagined.
-            </h2>
-            <p className="text-white/90 text-xl font-medium">
-              Secure, efficient, and connected.
-            </p>
+              Work reimagined. </h2>
+            <p className="text-white/90 text-xl font-medium"> Secure, efficient, and connected. </p>
           </div>
         </div>
 
-        {/* Features Content */}
+   
         <div className="bg-white dark:bg-gray-900 p-8 md:p-12 space-y-10">
-          {/* Core Features Section */}
+      
           <section>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                Core Features
-              </h3>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-white flex items-center gap-2"> Core Features</h3>
               <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-md uppercase">
-                New
-              </span>
+                New </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -116,8 +109,7 @@ const Features = () => {
                 <motion.div
                   key={index}
                   whileHover={{ x: 5 }}
-                  className="flex items-center gap-3 p-3 rounded-xl border border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                >
+                  className="flex items-center gap-3 p-3 rounded-xl border border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
                   <span className={`${item.color}`}>{item.icon}</span>
                   <span className="font-semibold text-gray-700 dark:text-gray-300">
                     {item.text}
@@ -129,23 +121,19 @@ const Features = () => {
 
           <hr className="border-gray-100 dark:border-gray-800" />
 
-          {/* Infrastructure Section */}
+        
           <section>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-white">
-                Platform Infrastructure
-              </h3>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-white">Platform Infrastructure</h3>
               <span className="bg-yellow-500 text-gray-900 text-xs font-bold px-3 py-1 rounded-md uppercase">
-                Enhanced
-              </span>
+                Enhanced</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {infrastructure.map((item, index) => (
                 <div key={index} className="flex items-center gap-3">
                   <span
-                    className={`${item.color} p-2 bg-gray-50 dark:bg-gray-800 rounded-lg`}
-                  >
+                    className={`${item.color} p-2 bg-gray-50 dark:bg-gray-800 rounded-lg`}>
                     {item.icon}
                   </span>
                   <span className="text-gray-600 dark:text-gray-400 font-medium">
@@ -156,15 +144,14 @@ const Features = () => {
             </div>
           </section>
 
-          {/* Call to Action Footer */}
+       
 
           <div className="pt-6">
             <Link to="/register">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full bg-linear-to-r from-green-500 to-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-500/20"
-              >
+                className="w-full bg-linear-to-r from-green-500 to-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-green-500/20">
                 Get Started with FreelanceHub
               </motion.button>
             </Link>

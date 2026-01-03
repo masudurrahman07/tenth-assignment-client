@@ -7,11 +7,8 @@ const LoadingSpinner = () => {
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-        className="w-12 h-12 border-4 border-blue-500 border-t-transparent dark:border-[#36e2c3] dark:border-t-transparent rounded-full"
-      />
-      <p className="mt-4 text-gray-500 dark:text-gray-400 font-medium text-sm">
-        Loading...
-      </p>
+        className="w-12 h-12 border-4 border-blue-500 border-t-transparent dark:border-[#36e2c3] dark:border-t-transparent rounded-full"/>
+      <p className="mt-4 text-gray-500 dark:text-gray-400 font-medium text-sm">Loading... </p>
     </div>
   );
 };

@@ -18,6 +18,11 @@ import JobDetails from "./pages/JobDetails";
 import UpdateJob from "./pages/UpdateJob";
 import Dashboard from "./pages/Dashboard";
 
+import Pricing from "./pages/Pricing";
+import UpgradePlan from "./pages/Upgrade";
+import Cookies from "./pages/Cookies";
+import Support from "./pages/Support";
+
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ErrorPage from "./pages/ErrorPage";
@@ -33,22 +38,25 @@ const App = () => {
 
           <main className="grow">
             <Routes>
-              {/* Public Routes */}
+            
               <Route path="/" element={<Home />} />
               <Route path="/features" element={<Features />} />
               <Route path="/allJobs" element={<AllJobs />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/upgrade-plan" element={<UpgradePlan />} />
+              <Route path="/cookies" element={<Cookies />} />
+              <Route path="/support" element={<Support />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
 
-              {/* Protected Routes */}
+       
               <Route
                 path="/dashboard"
                 element={
                   <PrivateRoute>
                     <Dashboard />
                   </PrivateRoute>
-                }
-              />
+                } />
 
               <Route
                 path="/addJob"
@@ -56,8 +64,7 @@ const App = () => {
                   <PrivateRoute>
                     <AddJob />
                   </PrivateRoute>
-                }
-              />
+                }/>
 
               <Route
                 path="/myAddedJobs"
@@ -65,8 +72,7 @@ const App = () => {
                   <PrivateRoute>
                     <MyAddedJobs />
                   </PrivateRoute>
-                }
-              />
+                }/>
 
               <Route
                 path="/my-accepted-tasks"
@@ -74,17 +80,9 @@ const App = () => {
                   <PrivateRoute>
                     <MyAcceptedTasks />
                   </PrivateRoute>
-                }
-              />
-
-              <Route
-                path="/allJobs/:id"
-                element={
-                  <PrivateRoute>
-                    <JobDetails />
-                  </PrivateRoute>
-                }
-              />
+                }/>
+              
+              <Route path="/allJobs/:id" element={<JobDetails />} />
 
               <Route
                 path="/updateJob/:id"
@@ -92,10 +90,9 @@ const App = () => {
                   <PrivateRoute>
                     <UpdateJob />
                   </PrivateRoute>
-                }
-              />
+                }/>
 
-              {/* Fallback */}
+         
               <Route path="*" element={<ErrorPage />} />
             </Routes>
           </main>
